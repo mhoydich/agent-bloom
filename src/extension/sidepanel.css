@@ -1,0 +1,30 @@
+:root {
+  color-scheme: light;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #101010;
+  background: #f5f0e6;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 280px; }
+main { min-height: 100vh; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+.eyebrow, .fine { margin: 0; font: 700 11px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; }
+h1 { margin: 0; font-size: clamp(52px, 17vw, 86px); line-height: .78; letter-spacing: -.075em; }
+.lede { margin: 0; max-width: 28rem; font-size: 16px; line-height: 1.4; }
+.status { border: 2px solid currentColor; padding: 14px; display: grid; grid-template-columns: 14px 1fr; gap: 12px; align-items: start; background: #fff; }
+.status p { margin: 4px 0 0; line-height: 1.35; }
+#lamp { width: 12px; height: 12px; border-radius: 50%; background: #777; margin-top: 2px; }
+body[data-state="engine-confirmed"] #lamp { background: #ffd526; box-shadow: 0 0 0 5px #ffd52644; }
+body[data-state="playing"] #lamp, body[data-state="complete"] #lamp { background: #1ab45c; box-shadow: 0 0 0 5px #1ab45c33; }
+body[data-state="failed"] #lamp, body[data-state="rejected"] #lamp { background: #ed4c35; }
+.actions { display: grid; gap: 8px; margin-top: auto; }
+button { min-height: 48px; border: 2px solid #101010; background: #ffd526; color: inherit; padding: 10px 12px; font: 800 13px/1.1 inherit; cursor: pointer; }
+button:first-child { background: #101010; color: #fff; }
+button:focus-visible { outline: 4px solid #3759ff; outline-offset: 2px; }
+.fine { color: #555; }
+
+@media (prefers-reduced-motion: no-preference) {
+  #lamp { transition: background-color 160ms ease, box-shadow 160ms ease; }
+  button { transition: transform 100ms ease; }
+  button:active { transform: translateY(2px); }
+}

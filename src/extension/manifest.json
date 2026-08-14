@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "AGENT BLOOM Bridge",
+  "description": "A small, explicit bridge for playing AGENT BLOOM scores in Chrome.",
+  "version": "0.1.0",
+  "minimum_chrome_version": "116",
+  "action": {
+    "default_title": "Open AGENT BLOOM"
+  },
+  "background": {
+    "service_worker": "service-worker.mjs",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "permissions": [
+    "sidePanel",
+    "offscreen",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://mhoydich.github.io/agent-bloom/*"
+      ],
+      "js": [
+        "page-bridge.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

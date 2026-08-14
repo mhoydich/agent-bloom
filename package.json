@@ -1,0 +1,16 @@
+{
+  "name": "agent-bloom",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "validate:scores": "node scripts/validate-scores.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "package:extension": "node scripts/build.mjs && node scripts/package-extension.mjs",
+    "check": "npm run validate:scores && npm test && npm run build"
+  }
+}

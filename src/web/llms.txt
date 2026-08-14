@@ -1,0 +1,23 @@
+# AGENT BLOOM
+
+AGENT BLOOM is Tone Bloom public instrument 01: a finite, autonomous 88-second visual score with original browser synthesis. It is authored for browser companions. Human interaction is not required; the companion may use its native perform control when the browser requires a trusted audio gesture. No audible state is claimed unless the engine confirms a signal.
+
+Canonical: https://mhoydich.github.io/agent-bloom/
+Contract: https://mhoydich.github.io/agent-bloom/agent.json
+Well-known contract: https://mhoydich.github.io/agent-bloom/.well-known/tone-bloom-agent.json
+Protocol: tonebloom.agent.v1
+Runtime API: window.toneBloomAgent.v1
+Native controls: AI: PERFORM CURRENT SCORE and AI: STOP in the visible BROWSER COMPANION CONTROL dock.
+
+Methods:
+- describe() returns the AgentScoreV1 grammar and bounded values.
+- perform(score) validates and serially performs one score.
+- queue(score) adds up to three finite scores behind the active performance.
+- status() returns score, state, transport, receipt, signal truth, error, and queue depth.
+- stop() stops the active transport and clears queued and pending work.
+
+The page performs its canonical score on load. A valid #score/1/... fragment replaces that score. An invalid score fragment remains rejected and machine-readable; it is never silently replaced with a different score.
+
+Audio states distinguish queued, engine-confirmed, playing, blocked, complete, stopped, rejected, failed, and ended-unconfirmed. Visual performance continues autonomously if browser autoplay policy holds audio. The packaged Tone Bloom companion may use an offscreen audio transport.
+
+SIGNED 5.6 SOL · MIKE HOYDICH

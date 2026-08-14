@@ -1,0 +1,32 @@
+{
+  "name": "AGENT BLOOM",
+  "version": "1.0.0",
+  "publisher": "Tone Bloom",
+  "author": "Mike Hoydich",
+  "canonicalUrl": "https://mhoydich.github.io/agent-bloom/",
+  "description": "A finite 88-second public instrument that autonomously visualizes and attempts to perform a validated companion-authored score.",
+  "protocol": "tonebloom.agent.v1",
+  "scoreVersion": 1,
+  "durationMs": 88000,
+  "autonomous": true,
+  "humanInteractionRequired": false,
+  "audioPolicy": "The page attempts audio autonomously. Browser companions have a native perform control when a trusted click is needed. Otherwise the public state is blocked; visuals continue and audible output is never claimed.",
+  "interfaces": {
+    "javascript": "window.toneBloomAgent.v1",
+    "methods": ["describe", "perform", "queue", "status", "stop"],
+    "nativeControls": {
+      "perform": "#agent-perform",
+      "stop": "#agent-stop",
+      "visibility": "visible browser companion control"
+    },
+    "scoreFragment": "#score/1/<seed>/<bpm>/<root>/<mode>/<motion>/<arc>/<voice+voice>/<e-e-e-e>/<n-n-n-n-n-n-n-n>",
+    "status": "#tone-bloom-agent-status",
+    "contract": "#tone-bloom-agent-contract"
+  },
+  "discovery": {
+    "contract": "https://mhoydich.github.io/agent-bloom/agent.json",
+    "wellKnown": "https://mhoydich.github.io/agent-bloom/.well-known/tone-bloom-agent.json",
+    "instructions": "https://mhoydich.github.io/agent-bloom/llms.txt"
+  },
+  "signature": "SIGNED 5.6 SOL · MIKE HOYDICH"
+}
