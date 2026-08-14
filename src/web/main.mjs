@@ -123,7 +123,7 @@ contractScript.textContent = JSON.stringify({
 const visuals = new AgentBloomVisuals(canvas);
 let localGeneration = 0;
 const audio = new AgentBloomAudio({ onState: (detail) => {
-  if (detail?.state === "interrupted" && currentState === "stopped") return;
+  if (detail?.state === "interrupted" && currentState === "playing") return;
   handleRuntimeState(detail, localGeneration);
 } });
 const queuedScores = [];
@@ -372,7 +372,9 @@ function stop() {
   return serializeOperation(async () => {
     const terminal = await haltCurrentTransport();
     transport = "none";
-    const truth = terminal?.truth || null;
+    const truth = terminal?.truth
+      ? { ...terminal.truth, engineState: "stopped", activeSources: 0, scheduledSources: 0, audible: false }
+      : null;
     setState("stopped", { truth });
     return Object.freeze({ state: "stopped", truth });
   });
