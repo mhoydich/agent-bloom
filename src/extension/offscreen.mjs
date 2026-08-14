@@ -68,7 +68,7 @@ async function stop(requestId) {
   return audioReply(requestId, STATE.STOPPED, {
     ...(result?.receipt || {}),
     phase: STATE.STOPPED,
-  });
+  }, undefined, result?.truth);
 }
 
 function audioReply(requestId, state, receipt, startedAtEpochMs, truth) {

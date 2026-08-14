@@ -273,8 +273,9 @@ async function haltCurrentTransport() {
     }, location.origin);
   }
   if (transport === "local" && ACTIVE_STATES.has(currentState)) {
-    await audio.stop({ fadeMs: 80, silent: true });
+    return audio.stop({ fadeMs: 80, silent: true });
   }
+  return null;
 }
 
 async function performNow(score, { updateLocation = true, clearQueue = true } = {}) {
@@ -366,10 +367,11 @@ function stop() {
   queuedScores.length = 0;
   settleAllBridgeRequests("stopped");
   return serializeOperation(async () => {
-    await haltCurrentTransport();
+    const terminal = await haltCurrentTransport();
     transport = "none";
-    setState("stopped");
-    return Object.freeze({ state: "stopped" });
+    const truth = terminal?.truth || null;
+    setState("stopped", { truth });
+    return Object.freeze({ state: "stopped", truth });
   });
 }
 

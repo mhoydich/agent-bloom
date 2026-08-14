@@ -176,15 +176,21 @@ async function stop(message, sender) {
   const current = await readSession();
   const activeRequestId = safeRequestId(current.requestId);
   const exists = await hasOffscreen();
+  let audioResponse = null;
   if (exists) {
-    await chrome.runtime.sendMessage(
+    audioResponse = await chrome.runtime.sendMessage(
       envelope("extension", MESSAGE.AUDIO_STOP, {
         target: "offscreen",
         requestId: activeRequestId || requestId,
       }),
     );
   }
-  const reply = stateReply(activeRequestId || requestId, STATE.STOPPED, { phase: STATE.STOPPED });
+  const reply = envelope("extension", MESSAGE.STATE, {
+    requestId: activeRequestId || requestId,
+    state: STATE.STOPPED,
+    receipt: immutableReceipt({ phase: STATE.STOPPED }),
+    ...truthField(audioResponse?.truth),
+  });
   await saveSession(reply);
   const route = (activeRequestId ? await sessionRoutes.read(activeRequestId) : null) || routeFromSender(sender);
   await broadcast(reply, route);

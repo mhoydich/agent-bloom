@@ -129,6 +129,13 @@ test("offscreen engine uses AgentBloomAudio and fails closed for unknown states"
   assert.doesNotMatch(source, /return STATE\.PLAYING;\s*\n}/);
 });
 
+test("stop receipts preserve terminal audio truth across the extension boundary", async () => {
+  const offscreen = await readFile(join(root, "src/extension/offscreen.mjs"), "utf8");
+  const worker = await readFile(join(root, "src/extension/service-worker.mjs"), "utf8");
+  assert.match(offscreen, /undefined, result\?\.truth/);
+  assert.match(worker, /truthField\(audioResponse\?\.truth\)/);
+});
+
 test("protocol preserves engine-confirmed separately from measured playing", async () => {
   const { CHANNEL, STATE } = await import("../src/extension/protocol.mjs");
   assert.equal(CHANNEL, PROTOCOL);

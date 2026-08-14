@@ -108,6 +108,7 @@ test("web runtime is companion-first, semantic, serialized, and truth-preserving
   assert.match(source, /serializeOperation/);
   assert.match(source, /generation/);
   assert.match(source, /settleAllBridgeRequests\("stopped"\)/);
+  assert.match(source, /setState\("stopped", \{ truth \}\)/);
   assert.match(source, /bridge-state-timeout/);
   assert.match(source, /setState\("ended-unconfirmed"/);
   assert.doesNotMatch(source, /bridge:accent/);
