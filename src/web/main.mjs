@@ -122,7 +122,10 @@ contractScript.textContent = JSON.stringify({
 
 const visuals = new AgentBloomVisuals(canvas);
 let localGeneration = 0;
-const audio = new AgentBloomAudio({ onState: (detail) => handleRuntimeState(detail, localGeneration) });
+const audio = new AgentBloomAudio({ onState: (detail) => {
+  if (detail?.state === "interrupted" && currentState === "stopped") return;
+  handleRuntimeState(detail, localGeneration);
+} });
 const queuedScores = [];
 const pendingBridgeRequests = new Map();
 let currentScore = DEFAULT_SCORE;
