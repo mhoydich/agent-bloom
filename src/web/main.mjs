@@ -163,7 +163,6 @@ function setState(state, detail = {}) {
   } else if (state !== "playing") {
     startedAtEpochMs = null;
   }
-  if ("truth" in detail) currentTruth = detail.truth || null;
   if (detail.reason) currentError = Object.freeze({ code: detail.code || currentError?.code || state, reason: String(detail.reason) });
   else if (!["rejected", "failed", "ended-unconfirmed", "error"].includes(state)) currentError = null;
 
@@ -174,6 +173,7 @@ function setState(state, detail = {}) {
   stateOutput.textContent = STATE_LABELS[state] || state.replaceAll("-", " ").toUpperCase();
   visuals.setState(state, { startedAtEpochMs: state === "playing" ? startedAtEpochMs : undefined });
   if (detail.receipt) setReceipt(detail.receipt);
+  if ("truth" in detail) currentTruth = detail.truth || null;
   updateCountdown();
   updateMachineStatus();
 
