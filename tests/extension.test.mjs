@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
-import { readFile, readdir } from "node:fs/promises";
+import { readFile, readdir, utimes } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import test from "node:test";
 import { DEFAULT_SCORE, PROTOCOL } from "../src/shared/score.mjs";
@@ -277,6 +278,19 @@ test("clean build copies the shared engine into both artifacts", () => {
   assert.equal(builtManifest.host_permissions, undefined);
 });
 
+test("extension ZIP is byte-reproducible when artifact mtimes change", async () => {
+  execFileSync(process.execPath, ["scripts/build.mjs"], { cwd: root, stdio: "pipe" });
+  execFileSync(process.execPath, ["scripts/package-extension.mjs"], { cwd: root, stdio: "pipe" });
+  const archive = join(root, "dist/packages/agent-bloom-bridge.zip");
+  const firstHash = await sha256File(archive);
+
+  const changedMtime = new Date("2026-08-13T23:59:58.000Z");
+  await utimes(join(root, "dist/extension/manifest.json"), changedMtime, changedMtime);
+  execFileSync(process.execPath, ["scripts/package-extension.mjs"], { cwd: root, stdio: "pipe" });
+
+  assert.equal(await sha256File(archive), firstHash);
+});
+
 async function allText(path) {
   let output = "";
   for (const entry of await readdir(path, { withFileTypes: true })) {
@@ -292,4 +306,8 @@ function dispatchRuntimeMessage(listener, message, sender) {
     const returned = listener(message, sender, resolve);
     if (returned !== true) reject(new Error("Expected an asynchronous runtime listener"));
   });
+}
+
+async function sha256File(path) {
+  return createHash("sha256").update(await readFile(path)).digest("hex");
 }
