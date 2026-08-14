@@ -38,7 +38,7 @@ function describe(message) {
     return "Engine running · waiting for measured signal";
   }
   if (message.state === STATE.PLAYING && message.truth?.audible === true) {
-    return `Audible signal · RMS ${Number(message.truth.rms).toFixed(4)}`;
+    return `Measured signal · RMS ${Number(message.truth.rms).toFixed(4)}`;
   }
   if (message.receipt?.receiptId) return `${message.receipt.receiptId} · ${message.receipt.phase || message.state}`;
   if (message.receipt?.seed) return `${message.receipt.seed.toUpperCase()} · ${message.receipt.phase || message.state}`;

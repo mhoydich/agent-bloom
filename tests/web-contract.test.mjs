@@ -59,6 +59,11 @@ test("Pages is a closed native-ESM artifact with complete static discovery", asy
   assert.match(html, /<link rel="alternate" type="application\/json" href="\.\/agent\.json"/);
 });
 
+test("Pages workflow preserves the well-known hidden contract", async () => {
+  const workflow = await readFile(join(root, ".github/workflows/pages.yml"), "utf8");
+  assert.match(workflow, /include-hidden-files:\s*true/);
+});
+
 test("poster is the reviewed exact 1200 by 630 social artifact", async () => {
   const png = await readFile(join(root, "src/web/assets/agent-bloom-og.png"));
   assert.equal(png.subarray(0, 8).toString("hex"), "89504e470d0a1a0a");

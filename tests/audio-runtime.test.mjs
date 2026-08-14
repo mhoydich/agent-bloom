@@ -61,6 +61,29 @@ test("a browser-blocked context can resume and schedule the score", async () => 
   await runtime.engine.dispose();
 });
 
+test("a never-settling autoplay resume becomes a bounded blocked state", async () => {
+  const timers = new FakeTimers();
+  const context = new FakeAudioContext(timers, ["pending"]);
+  const states = [];
+  const engine = new AgentBloomAudio({ contextFactory: () => context, onState: (state) => states.push(state), timers });
+
+  const resultPromise = engine.perform(DEFAULT_SCORE);
+  for (let index = 0; index < 50 && !states.some((state) => state.state === "validating"); index += 1) {
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+  assert.equal(states.at(-1)?.state, "validating");
+  await timers.advanceBy(1_500);
+  const result = await resultPromise;
+
+  assert.equal(result.state, "blocked");
+  assert.equal(result.receipt.state, "blocked");
+  assert.match(result.reason, /timed out/);
+  assert.equal(context.oscillators.length, 0);
+  assert.deepEqual(states.map((state) => state.state), ["validating", "blocked"]);
+
+  await engine.dispose();
+});
+
 test("stop cancels completion, stops scheduled sources, and reports terminal silence", async () => {
   const runtime = createRuntime();
   await runtime.engine.perform(DEFAULT_SCORE);
@@ -302,6 +325,7 @@ class FakeAudioContext {
   async resume() {
     this.resumeCalls += 1;
     const result = this.resumePlan.length ? this.resumePlan.shift() : "running";
+    if (result === "pending") return new Promise(() => {});
     if (result instanceof Error) throw result;
     this.state = result;
   }

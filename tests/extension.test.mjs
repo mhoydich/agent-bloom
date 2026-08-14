@@ -72,6 +72,12 @@ test("side panel presents autonomous companion operation without a human-start p
   assert.doesNotMatch(source, /press|click|human|yourself/i);
 });
 
+test("side panel labels analyser evidence as measured signal", async () => {
+  const source = await readFile(join(root, "src/extension/sidepanel.mjs"), "utf8");
+  assert.match(source, /Measured signal · RMS/);
+  assert.doesNotMatch(source, /Audible signal/);
+});
+
 test("service worker bounds scores, deduplicates offscreen creation, and persists state", async () => {
   const source = await readFile(join(root, "src/extension/service-worker.mjs"), "utf8");
   const validation = await readFile(join(root, "src/extension/score-validation.mjs"), "utf8");

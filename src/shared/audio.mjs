@@ -16,6 +16,7 @@ const VOICE_CONFIG = Object.freeze({
 });
 
 export const AUDIO_TRUTH_RMS = 0.0008;
+export const AUDIO_RESUME_TIMEOUT_MS = 1_500;
 
 function nowEpochForContext(context, contextTime) {
   return Date.now() + Math.max(0, (contextTime - context.currentTime) * 1000);
@@ -72,6 +73,23 @@ export class AgentBloomAudio {
     const pending = this.operation.catch(() => {}).then(operation);
     this.operation = pending;
     return pending;
+  }
+
+  async resumeContext() {
+    let timeoutHandle;
+    const timeout = new Promise((resolve) => {
+      timeoutHandle = this.timers.setTimeout(() => resolve("timeout"), AUDIO_RESUME_TIMEOUT_MS);
+      timeoutHandle?.unref?.();
+    });
+    try {
+      const outcome = await Promise.race([
+        Promise.resolve(this.context.resume()).then(() => "resumed", () => "failed"),
+        timeout,
+      ]);
+      return outcome;
+    } finally {
+      if (timeoutHandle) this.timers.clearTimeout(timeoutHandle);
+    }
   }
 
   emitState(state, detail = {}) {
@@ -150,7 +168,12 @@ export class AgentBloomAudio {
 
     try {
       this.ensureGraph();
-      await this.context.resume();
+      const resumeOutcome = await this.resumeContext();
+      if (resumeOutcome === "timeout") {
+        const receipt = await createReceipt(score, "blocked", this.takeoverEvents);
+        return this.emitState("blocked", { receipt, reason: "AudioContext resume timed out" });
+      }
+      if (resumeOutcome === "failed") throw new Error("AudioContext resume failed");
     } catch (error) {
       const receipt = await createReceipt(score, "blocked", this.takeoverEvents);
       return this.emitState("blocked", { receipt, reason: error instanceof Error ? error.message : String(error) });
@@ -329,7 +352,9 @@ export class AgentBloomAudio {
   async resumeNow() {
     try {
       if (!this.context) this.ensureGraph();
-      await this.context.resume();
+      const resumeOutcome = await this.resumeContext();
+      if (resumeOutcome === "timeout") throw new Error("AudioContext resume timed out");
+      if (resumeOutcome === "failed") throw new Error("AudioContext resume failed");
     } catch (error) {
       if (!this.currentScore) return { state: "blocked", reason: error instanceof Error ? error.message : String(error) };
       const receipt = await createReceipt(this.currentScore, "blocked", this.takeoverEvents);
